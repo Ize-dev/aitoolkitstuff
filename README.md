@@ -11,8 +11,8 @@ This is vibe-coded (because lazyness = maximum 😄) and a bit random, but very 
 SCREENSHOTS (mobile UI)
 
 <p float="left">
-  <img src="screenshot/Screenshot_20260104_113317_Vivaldi.jpg" width="240" />
   <img src="screenshot/Screenshot_20260104_113720_Vivaldi.jpg" width="240" />
+  <img src="screenshot/Screenshot_20260104_113317_Vivaldi.jpg" width="240" />
   <img src="screenshot/Screenshot_20260104_113736_Vivaldi.jpg" width="240" />
   <img src="screenshot/Screenshot_20260104_113832_Vivaldi.jpg" width="240" />
 </p>
