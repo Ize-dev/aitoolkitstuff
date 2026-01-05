@@ -10,13 +10,12 @@ This is vibe-coded (because lazyness = maximum 😄) and a bit random, but very 
 
 SCREENSHOTS (mobile UI)
 
-![Job overview / active training](/screenshot/Screenshot_20260104_113317_Vivaldi.jpg?raw=true "Job overview / active training")
-
-![Full dashboard with system stats](/screenshot/Screenshot_20260104_113720_Vivaldi.jpg?raw=true "Full dashboard with system stats")
-
-![Loss graph + samples grouped by step](/screenshot/Screenshot_20260104_113736_Vivaldi.jpg?raw=true "Loss graph + samples grouped by step")
-
-![Sample viewer with step / image navigation](/screenshot/Screenshot_20260104_113832_Vivaldi.jpg?raw=true "Sample viewer with step / image navigation")
+<p float="left">
+  <img src="screenshot/Screenshot_20260104_113317_Vivaldi.jpg" width="240" />
+  <img src="screenshot/Screenshot_20260104_113720_Vivaldi.jpg" width="240" />
+  <img src="screenshot/Screenshot_20260104_113736_Vivaldi.jpg" width="240" />
+  <img src="screenshot/Screenshot_20260104_113832_Vivaldi.jpg" width="240" />
+</p>
 
 
 FILES
