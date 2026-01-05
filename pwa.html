@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<meta content="#0b0b0c" name="theme-color"/>
+<title>AI Toolkit Wrapper</title>
+<style>
+    :root{
+      --bg:#0b0b0c;
+      --card:#121216;
+      --border:#1f1f26;
+      --text:#e9e9ea;
+      --muted:rgba(233,233,234,.85);
+      --btn:#1f2937;
+      --btnBorder:#334155;
+      --pill:#191920;
+      --pillBorder:#2a2a33;
+      --accent:#2dd4bf;
+
+      /* Scale with viewport */
+      --fs-base: clamp(16px, 3.6vw, 22px);
+      --fs-small: clamp(13px, 3.1vw, 18px);
+      --title: clamp(18px, 4.8vw, 28px);
+
+      --radius: 18px;
+
+      --btnH: clamp(46px, 9.5vw, 68px);
+      --btnPad: clamp(12px, 3.6vw, 18px);
+      --btnFont: clamp(14px, 3.4vw, 20px);
+
+      --gap: 8px;  /* gap between samples */
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{
+      margin:0; padding:0;
+      width:100%;
+      background:var(--bg);
+      color:var(--text);
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      font-size:var(--fs-base);
+      overflow-x:hidden;
+      -webkit-text-size-adjust:100%;
+      text-size-adjust:100%;
+    }
+
+    header{
+      background:var(--bg);
+      border-bottom:1px solid #1c1c1f;
+      padding:16px;
+    }
+    .title{ font-weight:1000; font-size:var(--title); letter-spacing:.2px; }
+    .sub{ opacity:.85; font-size:var(--fs-small); margin-top:6px; }
+
+    main{
+      padding:14px;
+      display:grid;
+      gap:14px;
+      max-width:1100px;
+      margin:0 auto;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:16px;
+      max-width:100%;
+    }
+
+    .jobHeader{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:12px;
+      align-items:start;
+      max-width:100%;
+      min-width:0;
+    }
+    .jobHeader > *{ min-width:0; }
+
+    .label{ font-size:var(--fs-small); opacity:.85; }
+    .val{ font-weight:1000; font-size:clamp(16px, 4vw, 24px); }
+    .muted{ opacity:.9; font-size:var(--fs-small); word-break:break-word; }
+
+    .actions{
+      display:grid;
+      gap:10px;
+      justify-items:end;
+      min-width:0;
+      max-width:100%;
+    }
+
+    .bar{
+      height:16px;
+      background:#1a1a22;
+      border:1px solid var(--pillBorder);
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:14px;
+    }
+    .fill{ height:100%; width:0%; background:var(--accent); }
+
+    a,button{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 var(--btnPad);
+      border-radius:16px;
+      border:1px solid var(--btnBorder);
+      background:var(--btn);
+      color:var(--text);
+      font-weight:1000;
+      font-size:var(--btnFont);
+      text-decoration:none;
+      min-height:var(--btnH);
+      min-width:0;
+      max-width:100%;
+      cursor:pointer;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--pillBorder);
+      background:var(--pill);
+      font-size:clamp(13px, 3.2vw, 18px);
+      font-weight:1000;
+      min-height:var(--btnH);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:0;
+      max-width:100%;
+      white-space:nowrap;
+    }
+
+    .rowLine{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    /* ===== Pretty Stats ===== */
+    .statsGrid{
+      margin-top:14px;
+      display:grid;
+      gap:14px;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 780px){
+      .statsGrid{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .statCard{
+      background: linear-gradient(180deg, rgba(20,20,28,.92), rgba(10,10,14,.92));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      padding:14px 14px 16px;
+      box-shadow: 0 10px 35px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+
+    .statHeader{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      margin-bottom:10px;
+    }
+    .statTitle{
+      font-weight:1000;
+      font-size:clamp(16px, 4vw, 22px);
+      letter-spacing:.2px;
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .badge{
+      font-weight:1000;
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      opacity:.95;
+      white-space:nowrap;
+    }
+
+    .statGrid2{
+      display:grid;
+      gap:14px;
+      grid-template-columns: 1fr 1fr;
+      align-items:start;
+    }
+    @media (max-width: 520px){
+      .statGrid2{ grid-template-columns: 1fr; }
+    }
+
+    .kv{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      font-size:clamp(13px, 3.2vw, 16px);
+      min-width:0;
+    }
+    .kv .icon{
+      width:22px; height:22px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:8px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      flex:0 0 auto;
+    }
+    .kv .label2{
+      opacity:.85;
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .kv .value{
+      margin-left:auto;
+      font-weight:1000;
+      opacity:.98;
+      white-space:nowrap;
+    }
+
+    .miniRows{
+      display:grid;
+      gap:10px;
+    }
+
+    .barRow{
+      display:grid;
+      gap:6px;
+      min-width:0;
+    }
+    .barTop{
+      display:flex;
+      gap:10px;
+      align-items:baseline;
+      font-size:clamp(13px, 3.2vw, 16px);
+      min-width:0;
+    }
+    .barTop .bLabel{ opacity:.85; min-width:0; }
+    .barTop .bValue{
+      margin-left:auto;
+      font-weight:1000;
+      opacity:.98;
+      white-space:nowrap;
+    }
+    .pbar{
+      height:10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .pbar > i{
+      display:block;
+      height:100%;
+      width:0%;
+      border-radius:999px;
+    }
+
+    /* Colorpalette */
+    .c-cpu   { background: linear-gradient(90deg, #2dd4bf, #22c55e); } 
+    .c-mem   { background: linear-gradient(90deg, #60a5fa, #2563eb); } 
+    .c-gpu   { background: linear-gradient(90deg, #fb7185, #ef4444); } 
+    .c-pwr   { background: linear-gradient(90deg, #fde047, #f59e0b); } 
+    .c-temp  { background: linear-gradient(90deg, #fbbf24, #f97316); } 
+    .c-clk   { background: linear-gradient(90deg, #a78bfa, #7c3aed); } 
+
+    .smallNote{
+      margin-top:10px;
+      font-size:12px;
+      opacity:.75;
+      word-break:break-word;
+    }
+
+    /* Samples */
+    .sampleBlock{ display:grid; gap:16px; margin-top:14px; }
+
+    .sampleRowHead{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      align-items:end;
+      max-width:100%;
+    }
+    .stepTag{ font-weight:1000; font-size:clamp(16px, 4.2vw, 24px); }
+    .tiny{ font-size:var(--fs-small); opacity:.85; }
+
+    .sampleRow{
+      --n: 9;
+      display:flex;
+      gap:var(--gap);
+      width:100%;
+      max-width:100%;
+      overflow:hidden;
+      align-items:stretch;
+    }
+    .sampleRow > img{
+      flex: 0 0 calc((100% - (calc(var(--n) - 1) * var(--gap))) / var(--n));
+      width:0;
+      aspect-ratio: 1 / 1;
+      object-fit:cover;
+      border-radius:12px;
+      border:1px solid #262634;
+      background:#0f0f12;
+      cursor:pointer;
+      min-width:0;
+      display:block;
+    }
+
+    /* Lightbox */
+    .lb{ position:fixed; inset:0; display:none; z-index:9999; }
+    .lb.open{ display:block; }
+    .lbBackdrop{ position:absolute; inset:0; background:rgba(0,0,0,.92); }
+
+    .lbContent{
+      position:absolute; inset:10px;
+      border-radius:22px;
+      background:#0b0b0d;
+      border:1px solid #262634;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      max-width:100%;
+      min-width:0;
+    }
+
+    .lbTop{
+      padding:12px 14px;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      align-items:start;
+      background:rgba(15,15,20,.92);
+      border-bottom:1px solid #262634;
+      min-width:0;
+    }
+    .lbTitle{ font-weight:1000; font-size:clamp(16px, 4vw, 22px); }
+    .lbMeta{ opacity:.85; font-size:clamp(12px, 3.2vw, 16px); word-break:break-word; }
+
+    .lbClose{
+      width:var(--btnH);
+      height:var(--btnH);
+      padding:0;
+      border-radius:16px;
+      font-size:clamp(16px, 4.2vw, 22px);
+      background:#1f1f27;
+    }
+
+    .lbMain{
+      flex:1;
+      background:#000;
+      display:flex;
+      align-items:stretch;
+      justify-content:stretch;
+      touch-action:none;
+      min-height:0;
+    }
+    .lbImg{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      background:#000;
+    }
+
+    .lbBottom{
+      padding:12px;
+      background:rgba(15,15,20,.92);
+      border-top:1px solid #262634;
+      max-width:100%;
+      min-width:0;
+    }
+
+    .lbGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      width:100%;
+      min-width:0;
+    }
+    .pair{
+      display:flex;
+      gap:12px;
+      width:100%;
+      min-width:0;
+    }
+    .lbBtn{
+      flex:1 1 0;
+      width:0;
+      min-width:0;
+      min-height:var(--btnH);
+      border-radius:16px;
+      border:1px solid var(--btnBorder);
+      background:#1f1f27;
+      color:var(--text);
+      font-weight:1000;
+      font-size:var(--btnFont);
+      padding:0 8px;
+      white-space:nowrap;
+    }
+
+    .lbIdx{
+      margin-top:10px;
+      font-size:clamp(12px, 3.2vw, 16px);
+      opacity:.9;
+      font-weight:1000;
+      word-break:break-word;
+    }
+  
+    /* ===== Loss Graph ===== */
+    .graphCard{
+      padding:14px;
+    }
+    .graphHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .graphTitle{
+      font-weight:1000;
+      font-size:clamp(16px, 4vw, 22px);
+    }
+    .graphMeta{
+      opacity:.85;
+      font-size:var(--fs-small);
+      word-break:break-word;
+    }
+    .graphWrap{
+      border:1px solid #262634;
+      border-radius:16px;
+      overflow:hidden;
+      background:#070709;
+    }
+    svg.lossSvg{
+      width:100%;
+      height: 180px;
+      display:block;
+    }
+    .lossAxisText{
+      font-size:12px;
+      fill: rgba(233,233,234,.75);
+      font-weight:700;
+    }
+    .lossGridLine{
+      stroke: rgba(255,255,255,.08);
+      stroke-width:1;
+      shape-rendering:crispEdges;
+    }
+    .lossLine{
+      fill:none;
+      stroke: #57a8ff;
+      stroke-width:2.2;
+      vector-effect: non-scaling-stroke;
+    }
+    .lossDot{
+      fill:#57a8ff;
+      stroke:#0b0b0c;
+      stroke-width:2;
+    }
+
+  
+    /* ===== Collapsible sections ===== */
+    .card.collapsible .cardTop{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .collapseBtn{
+      cursor:pointer;
+      user-select:none;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      border-radius:999px;
+      padding:8px 12px;
+      font-weight:900;
+      font-size:12px;
+      opacity:.9;
+    }
+    .collapseBtn:hover{ opacity:1; }
+    .card.collapsed .cardBody{ display:none; }
+
+  
+    /* ===== Collapsible sections (header click) ===== */
+    .collapsible .jobHeader,
+    .collapsible .graphHeader{
+      cursor:pointer;
+      user-select:none;
+    }
+    .collapsible .jobHeader:hover,
+    .collapsible .graphHeader:hover{
+      opacity: .95;
+    }
+    .collapsible .collapseCaret{
+      margin-left:8px;
+      font-weight:1000;
+      opacity:.8;
+    }
+
+  </style>
+</head>
+<body>
+<header>
+<div class="title">AI Toolkit Wrapper</div>
+<div class="sub" id="conn">connecting…</div>
+</header>
+<main>
+
+<section class="card" id="secJob">
+
+<div class="jobHeader">
+<div>
+<div class="label">Active job</div>
+<div class="val" id="jobName">—</div>
+<div class="muted" id="jobId">—</div>
+<div class="muted" id="jobInfo">—</div>
+</div>
+<div class="actions">
+<div class="pill" id="jobStatus">—</div>
+<a href="#" id="openUI" target="_self">WebUI</a>
+</div>
+</div>
+<div class="bar"><div class="fill" id="fill"></div></div>
+<div class="rowLine">
+<div class="muted" id="stepLine">Step — / —</div>
+<div class="muted" id="speedLine">—</div>
+</div>
+<!-- Pretty Stats -->
+<div class="statsGrid">
+<!-- CPU -->
+<div class="statCard">
+<div class="statHeader">
+<div class="statTitle" id="cpuName">CPU</div>
+<div class="badge">system</div>
+</div>
+<div class="statGrid2">
+<div class="barRow">
+<div class="barTop">
+<span class="bLabel">CPU Load</span>
+<span class="bValue" id="cpuLoadTxt">—</span>
+</div>
+<div class="pbar"><i class="c-cpu" id="cpuLoadBar"></i></div>
+</div>
+<div class="barRow">
+<div class="barTop">
+<span class="bLabel">Memory</span>
+<span class="bValue" id="memTxt">—</span>
+</div>
+<div class="pbar"><i class="c-mem" id="memBar"></i></div>
+</div>
+</div>
+<div class="smallNote" id="etaLine">restzeit: —</div>
+</div>
+<!-- GPU -->
+<div class="statCard">
+<div class="statHeader">
+<div class="statTitle" id="gpuName">GPU</div>
+<div class="badge" id="gpuIdx">#0</div>
+</div>
+<div class="statGrid2">
+<!-- left mini stats -->
+<div class="miniRows">
+<div class="kv">
+<span class="icon">🌡️</span>
+<span class="label2">Temperature</span>
+<span class="value" id="gpuTempTxt">—</span>
+</div>
+<div class="kv">
+<span class="icon">🌀</span>
+<span class="label2">Fan Speed</span>
+<span class="value" id="gpuFanTxt">—</span>
+</div>
+<div class="kv">
+<span class="icon">🟣</span>
+<span class="label2">Clock</span>
+<span class="value" id="gpuClockTxt">—</span>
+</div>
+</div>
+<!-- right bars -->
+<div class="miniRows">
+<div class="barRow">
+<div class="barTop">
+<span class="bLabel">GPU Load</span>
+<span class="bValue" id="gpuLoadTxt">—</span>
+</div>
+<div class="pbar"><i class="c-gpu" id="gpuLoadBar"></i></div>
+</div>
+<div class="barRow">
+<div class="barTop">
+<span class="bLabel">Memory</span>
+<span class="bValue" id="gpuMemTxt">—</span>
+</div>
+<div class="pbar"><i class="c-mem" id="gpuMemBar"></i></div>
+</div>
+<div class="barRow">
+<div class="barTop">
+<span class="bLabel">Power Draw</span>
+<span class="bValue" id="gpuPwrTxt">—</span>
+</div>
+<div class="pbar"><i class="c-pwr" id="gpuPwrBar"></i></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section><section class="card graphCard collapsible" id="secLoss"><div class="cardTop"><div class="graphHeader">
+<div style="min-width:0">
+<div class="graphTitle">Loss graph</div>
+</div>
+<div class="cardBody">
+
+</div>
+</div>
+</div><div class="cardBody"><div class="graphWrap">
+<svg aria-label="loss graph" class="lossSvg" id="lossSvg" preserveaspectratio="none" viewBox="0 0 1000 180" viewbox="0 0 1000 260">
+<!-- grid -->
+<g id="lossGrid"></g>
+<!-- line -->
+<path class="lossLine" d="" id="lossPath"></path>
+<!-- last point -->
+<circle class="lossDot" cx="0" cy="0" id="lossLastDot" opacity="0" r="6"></circle>
+<!-- axis labels -->
+<text class="lossAxisText" id="lossMinTxt" x="8" y="170">—</text>
+<text class="lossAxisText" id="lossMaxTxt" x="8" y="16">—</text>
+</svg>
+</div></div></section>
+<section class="card collapsible" id="secSamples"><div class="cardTop"><div class="jobHeader">
+<div>
+<div class="label">Samples</div>
+<div class="muted" id="sampleMeta">waiting…</div>
+</div>
+<div class="actions" style="justify-items:end">
+<button id="btnRefresh">Refresh</button>
+<span class="pill" id="autoState">auto: on</span>
+</div>
+</div>
+</div><div class="cardBody"><div class="sampleBlock" id="sampleBlock"></div></div></section>
+</main>
+<!-- Lightbox -->
+<div class="lb" id="lb">
+<div class="lbBackdrop" id="lbBackdrop"></div>
+<div class="lbContent">
+<div class="lbTop">
+<div style="min-width:0">
+<div class="lbTitle" id="lbTitle">—</div>
+<div class="lbMeta" id="lbMeta">—</div>
+</div>
+<button class="lbClose" id="lbClose">✕</button>
+</div>
+<div class="lbMain" id="lbMain">
+<img alt="preview" class="lbImg" id="lbImg" src=""/>
+</div>
+<div class="lbBottom">
+<div class="lbGrid">
+<div class="pair">
+<button class="lbBtn" id="lbStepUp">▲ step</button>
+<button class="lbBtn" id="lbStepDown">▼ step</button>
+</div>
+<div class="pair">
+<button class="lbBtn" id="lbPrev">◀ bild</button>
+<button class="lbBtn" id="lbNext">▶ bild</button>
+</div>
+</div>
+<div class="lbIdx" id="lbIndex">—</div>
+</div>
+</div>
+</div>
+<script>
+  const JOB_POLL_MS     = 2000;
+  const STATS_POLL_MS   = 2000;
+  const SAMPLE_POLL_MS  = 4000;
+  const LOSS_POLL_MS    = 2000;
+  const LOSS_MAX_POINTS = 1400;
+
+  const MAX_GROUPS      = 14;
+  const MAX_PER_GROUP   = 60;
+
+  const $ = (id) => document.getElementById(id);
+
+  function safeOn(id, ev, fn){
+    const el = $(id);
+    if (!el) return false;
+    el.addEventListener(ev, fn);
+    return true;
+  }
+
+  $("openUI").href = "http://192.168.178.38:8675/";
+
+  let activeJob = null;
+  let lastSampleKey = null;
+  let lastStep = null;
+  let autoOn = true;
+
+  let groupsNewest = []; // newest-first
+
+  // Loss graph state
+  let lossKey = "loss/loss";
+  setTxt("lossKeyPill", lossKey);
+  let lossPoints = []; // {step, wall_time, value}
+  let lossSinceStep = 0;
+  let lbGroupIdx = 0;
+  let lbItemIdx = 0;
+
+  // helpers
+  function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+  function setBar(id, pct){
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.width = (Math.round(clamp01(pct) * 1000) / 10) + "%";
+  }
+  function setTxt(id, v){
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = v;
+  }
+
+
+
+  document.addEventListener('DOMContentLoaded', initCollapsibles);
+
+  function initCollapsibles(){
+    // attach once
+    document.querySelectorAll("section.card.collapsible").forEach(sec => {
+      if (sec.dataset.collapseWired === "1") return;
+      sec.dataset.collapseWired = "1";
+
+      const header = sec.querySelector(".graphHeader") || sec.querySelector(".jobHeader");
+      if (!header) return;
+
+      // add caret
+      let caret = header.querySelector(".collapseCaret");
+      if (!caret) {
+        caret = document.createElement("span");
+        caret.className = "collapseCaret";
+        caret.textContent = "▾";
+        header.appendChild(caret);
+      }
+
+      header.addEventListener("click", () => {
+        const collapsed = sec.classList.toggle("collapsed");
+        caret.textContent = collapsed ? "▸" : "▾";
+      });
+    });
+  }
+
+
+  function toNum(v){
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+
+
+  async function jget(apiPath) {
+    const r = await fetch("/api" + apiPath, { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status + " " + r.statusText);
+    return await r.json();
+  }
+
+  function pickActiveJob(jobs) {
+    if (!Array.isArray(jobs) || jobs.length === 0) return null;
+    return jobs.find(j => j.status === "running") || jobs[0];
+  }
+
+  function totalStepsFromJobConfig(job) {
+    const direct = toNum(job?.total_steps ?? job?.steps_total ?? job?.max_steps ?? job?.totalSteps);
+    if (direct != null && direct > 0) return direct;
+
+    try {
+      const jc = (typeof job?.job_config === "string") ? JSON.parse(job.job_config) : job?.job_config;
+
+      const candidates = [
+        jc?.config?.process?.[0]?.train?.steps,
+        jc?.config?.process?.[0]?.train?.max_train_steps,
+        jc?.config?.train?.steps,
+        jc?.train?.steps,
+        jc?.steps,
+      ];
+
+      for (const c of candidates) {
+        const n = toNum(c);
+        if (n != null && n > 0) return n;
+      }
+      return null;
+    } catch { return null; }
+  }
+
+
+
+  function imgUrlFromPath(p) {
+    return "/api/img/" + encodeURIComponent(p);
+  }
+
+  function parseSampleMeta(p) {
+    const file = (p.split("\\").pop() || p);
+    const m = file.match(/__0*([0-9]+)_([0-9]+)\./);
+    const step = m ? parseInt(m[1], 10) : -1;
+    const idx  = m ? parseInt(m[2], 10) : -1;
+    return { step, idx, file };
+  }
+
+  function groupSamplesNewestFirst(samplePaths) {
+    const map = new Map();
+    for (const p of samplePaths) {
+      const meta = parseSampleMeta(p);
+      const key = meta.step;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push({ path: p, ...meta });
+    }
+
+    const stepsAsc = [...map.keys()].sort((a,b) => a - b);
+    const groupsAsc = stepsAsc.map(step => {
+      const arr = map.get(step);
+      arr.sort((a,b) => a.idx - b.idx);
+      return { step, items: arr };
+    });
+
+    return groupsAsc.reverse();
+  }
+
+  function formatEta(sec) {
+    if (!isFinite(sec) || sec <= 0) return "—";
+    sec = Math.round(sec);
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    if (h > 0) return `${h}h ${String(m).padStart(2,"0")}m ${String(s).padStart(2,"0")}s`;
+    return `${m}m ${String(s).padStart(2,"0")}s`;
+  }
+
+  function parseIterPerSec(speedString) {
+    if (!speedString) return null;
+    const s = String(speedString);
+
+    // Formats like: "2.34 iter/sec", "2.34 it/s", "2.34 iterations/s"
+    let m = s.match(/([\d.,]+)\s*(?:iter\/sec|iter\/s|it\/s|it\/sec|iterations\/s)/i);
+    if (m) {
+      const v = parseFloat(m[1].replace(",", "."));
+      return isFinite(v) ? v : null;
+    }
+
+    // Formats like: "2.30 sec/iter", "2.30 sec/it", "2.30 s/iter" -> ips = 1 / seconds_per_iter
+    m = s.match(/([\d.,]+)\s*(?:s|sec|secs|second|seconds)\s*\/\s*(?:it|iter|iteration|iterations)/i);
+    if (m) {
+      const spi = parseFloat(m[1].replace(",", "."));
+      if (isFinite(spi) && spi > 0) return 1 / spi;
+    }
+
+    return null;
+  }
+
+
+
+
+  function renderEtaFromJob(job) {
+    const total = totalStepsFromJobConfig(job);
+    const step  = toNum(job?.step ?? job?.current_step ?? job?.train_step ?? job?.progress?.step);
+    const ips   = parseIterPerSec(job?.speed_string);
+
+    if (total != null && step != null) {
+      const remaining = Math.max(0, total - step);
+
+      // ETA nur sinnvoll wenn ips > 0 und remaining > 0
+      if (ips != null && ips > 0 && remaining > 0) {
+                const etaSec = remaining / ips;
+        const eta = formatEta(etaSec);
+        const finish = new Date(Date.now() + etaSec * 1000);
+        const finishStr = finish.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        setTxt("etaLine", `remaining: ${eta} • finish at: ${finishStr} • ${ips.toFixed(2)} iter/sec • remaining: ${remaining}`);      } else if (remaining === 0) {
+        setTxt("etaLine", `remaining: done • ${ips != null ? ips.toFixed(2) : "—"} iter/sec • remaining: 0`);
+      } else {
+        setTxt("etaLine", `remaining: — • iter/sec: ${ips != null ? ips.toFixed(2) : "—"} • remaining: ${remaining}`);
+      }
+    } else {
+      setTxt("etaLine", "remaining: —");
+    }
+  }
+
+
+
+  function renderGroupedSamples() {
+    const block = $("sampleBlock");
+    block.innerHTML = "";
+
+    const shown = groupsNewest.slice(0, MAX_GROUPS);
+
+    for (let gi = 0; gi < shown.length; gi++) {
+      const g = shown[gi];
+
+      const head = document.createElement("div");
+      head.className = "sampleRowHead";
+      head.innerHTML = `
+        <div class="stepTag">step ${g.step}</div>
+        <div class="tiny">${g.items.length} images</div>
+      `;
+
+      const row = document.createElement("div");
+      row.className = "sampleRow";
+
+      const items = g.items.slice(0, MAX_PER_GROUP);
+      row.style.setProperty("--n", String(items.length)); // <<< wichtig
+
+      items.forEach((it, ii) => {
+        const img = document.createElement("img");
+        img.src = imgUrlFromPath(it.path);
+        img.alt = it.file;
+        img.loading = "lazy";
+        img.addEventListener("click", () => openLightbox(gi, ii));
+        row.appendChild(img);
+      });
+
+      const wrap = document.createElement("div");
+      wrap.appendChild(head);
+      wrap.appendChild(row);
+      block.appendChild(wrap);
+    }
+  }
+
+  async function refreshJob() {
+    const data = await jget("/jobs");
+    const job = pickActiveJob(data.jobs);
+    activeJob = job;
+
+    if (!job) {
+      $("jobName").textContent = "no job";
+      $("jobId").textContent = "—";
+      $("jobInfo").textContent = "—";
+      $("jobStatus").textContent = "idle";
+      $("fill").style.width = "0%";
+      $("stepLine").textContent = "Step — / —";
+      $("speedLine").textContent = "—";
+      renderEtaFromJob({ speed_string: null, step: null, job_config: null });
+      return;
+    }
+
+    $("jobName").textContent = job.name || "—";
+    $("jobId").textContent = job.id || "—";
+    $("jobInfo").textContent = job.info || "—";
+    $("jobStatus").textContent = job.status || "—";
+    $("speedLine").textContent = job.speed_string || "—";
+
+    const total = totalStepsFromJobConfig(job);
+    const step = toNum(job?.step ?? job?.current_step ?? job?.train_step ?? job?.progress?.step);
+
+    if (step !== lastStep) {
+      lastStep = step;
+      let pct = 0;
+      if (step != null && total != null) pct = Math.max(0, Math.min(1, step / total));
+      $("fill").style.width = Math.round(pct * 100) + "%";
+      $("stepLine").textContent = `Step ${step ?? "—"} / ${total ?? "—"} (${Math.round(pct*100)}%)`;
+    }
+
+    renderEtaFromJob(job);
+  }
+
+  async function refreshStats() {
+    // CPU
+    try {
+      const cpu = await jget("/cpu");
+      setTxt("cpuName", cpu?.name || "CPU");
+
+      const load = (cpu?.currentLoad != null) ? cpu.currentLoad : null;
+      setTxt("cpuLoadTxt", (load != null) ? (load.toFixed(1) + "%") : "—");
+      setBar("cpuLoadBar", (load != null) ? load/100 : 0);
+
+      const totalMem = cpu?.totalMemory;
+      const freeMem  = cpu?.freeMemory ?? cpu?.availableMemory;
+      if (totalMem != null && freeMem != null) {
+        const used = Math.max(0, totalMem - freeMem);
+        const pct = totalMem > 0 ? used / totalMem : 0;
+        setTxt("memTxt", `${Math.round(used/1024*10)/10} GB / ${Math.round(totalMem/1024*10)/10} GB`);
+        setBar("memBar", pct);
+      } else {
+        setTxt("memTxt", "—");
+        setBar("memBar", 0);
+      }
+    } catch {}
+
+    // GPU
+    try {
+      const gpu = await jget("/gpu");
+      const g0 = gpu?.gpus?.[0];
+      setTxt("gpuName", g0?.name || "GPU");
+      setTxt("gpuIdx", (g0?.index != null) ? ("# " + g0.index) : "#0");
+
+      // left
+      const temp = g0?.temperature;
+      setTxt("gpuTempTxt", (temp != null) ? `${Math.round(temp)}°C` : "—");
+
+      const fan = g0?.fan?.speed;
+      setTxt("gpuFanTxt", (fan != null) ? `${Math.round(fan)}%` : "—");
+
+      const clk = g0?.clocks?.graphics;
+      setTxt("gpuClockTxt", (clk != null) ? `${Math.round(clk)} MHz` : "—");
+
+      // bars right
+      const util = g0?.utilization?.gpu;
+      setTxt("gpuLoadTxt", (util != null) ? `${Math.round(util)}%` : "—");
+      setBar("gpuLoadBar", (util != null) ? util/100 : 0);
+
+      const used = g0?.memory?.used;
+      const tot  = g0?.memory?.total;
+      if (used != null && tot != null && tot > 0) {
+        setTxt("gpuMemTxt", `${Math.round(used/1024*10)/10} GB / ${Math.round(tot/1024*10)/10} GB`);
+        setBar("gpuMemBar", used / tot);
+      } else {
+        setTxt("gpuMemTxt", "—");
+        setBar("gpuMemBar", 0);
+      }
+
+      const pd = g0?.power?.draw;
+      const pl = g0?.power?.limit;
+      if (pd != null && pl != null && pl > 0) {
+        setTxt("gpuPwrTxt", `${pd.toFixed(0)}W / ${pl.toFixed(0)}W`);
+        setBar("gpuPwrBar", pd / pl);
+      } else if (pd != null) {
+        setTxt("gpuPwrTxt", `${pd.toFixed(0)}W`);
+        setBar("gpuPwrBar", 0);
+      } else {
+        setTxt("gpuPwrTxt", "—");
+        setBar("gpuPwrBar", 0);
+      }
+    } catch {}
+  }
+
+  async function checkSamplesAndUpdate(force=false) {
+    if (!activeJob?.id) return;
+
+    const s = await jget(`/jobs/${activeJob.id}/samples`);
+    const arr = s.samples || [];
+
+    const count = arr.length;
+    const last = count ? arr[count - 1] : null;
+
+    const key = (last || "") + "|" + count;
+    const changed = force || (key !== lastSampleKey);
+
+    $("sampleMeta").textContent =
+      `samples total: ${count} • latest: ${last ? last.split("\\").pop() : "—"}`;
+
+    if (changed) {
+      lastSampleKey = key;
+      groupsNewest = groupSamplesNewestFirst(arr);
+      renderGroupedSamples();
+      try { await refreshLoss(false); } catch {}
+      if (!force && "vibrate" in navigator) navigator.vibrate(18);
+
+      if ($("lb").classList.contains("open")) {
+        const currentStep = groupsNewest[lbGroupIdx]?.step;
+        if (currentStep != null) {
+          const newIdx = groupsNewest.findIndex(g => g.step === currentStep);
+          if (newIdx >= 0) lbGroupIdx = newIdx;
+        }
+        clampLightbox();
+        renderLightbox();
+      }
+    }
+  }
+
+  async function tickJobs() {
+    try { $("conn").textContent = "online"; await refreshJob(); }
+    catch { $("conn").textContent = "offline"; }
+  }
+
+  async function tickSamples() {
+    if (!autoOn) return;
+    try { await checkSamplesAndUpdate(false); } catch {}
+  }
+
+  safeOn("btnRefresh","click", async () => {
+    initCollapsibles();
+    await tickJobs();
+    await refreshStats();
+    await checkSamplesAndUpdate(true);
+    try { await refreshLoss(true); } catch {}
+    await refreshLoss(true);
+  });
+
+  safeOn("btnLossRefresh","click", async () => {
+    try { await refreshLoss(true); } catch {}
+  });
+  $("autoState").addEventListener("click", () => {
+    autoOn = !autoOn;
+    $("autoState").textContent = "auto: " + (autoOn ? "on" : "off");
+  });
+
+  // Lightbox
+  const lb = $("lb");
+  const lbBackdrop = $("lbBackdrop");
+  const lbImg = $("lbImg");
+  const lbTitleEl = $("lbTitle");
+  const lbMetaEl = $("lbMeta");
+  const lbIndexEl = $("lbIndex");
+  const lbMain = $("lbMain");
+
+  function clampLightbox() {
+    if (!groupsNewest.length) { lbGroupIdx=0; lbItemIdx=0; return; }
+    lbGroupIdx = Math.max(0, Math.min(lbGroupIdx, groupsNewest.length - 1));
+    const items = groupsNewest[lbGroupIdx]?.items || [];
+    if (!items.length) { lbItemIdx=0; return; }
+    lbItemIdx = Math.max(0, Math.min(lbItemIdx, items.length - 1));
+  }
+
+  function openLightbox(groupIndexShown, itemIndex) {
+    lbGroupIdx = groupIndexShown;
+    lbItemIdx = itemIndex || 0;
+    lb.classList.add("open");
+    clampLightbox();
+    renderLightbox();
+  }
+  function closeLightbox() {
+    lb.classList.remove("open");
+    lbImg.src = "";
+  }
+
+  function cur() {
+    const g = groupsNewest[lbGroupIdx];
+    const items = g?.items || [];
+    const it = items[lbItemIdx];
+    return { g, items, it };
+  }
+
+  function renderLightbox() {
+    if (!lb.classList.contains("open")) return;
+    clampLightbox();
+    const { g, items, it } = cur();
+    if (!g || !it) return;
+
+    lbTitleEl.textContent = `step ${g.step}`;
+    lbMetaEl.textContent = it.file;
+    lbIndexEl.textContent = `set ${lbGroupIdx+1}/${groupsNewest.length} • bild ${lbItemIdx+1}/${items.length} • step ${g.step}`;
+    lbImg.src = imgUrlFromPath(it.path);
+  }
+
+  function prevImage() {
+    const { items } = cur();
+    if (!items.length) return;
+    lbItemIdx = (lbItemIdx - 1 + items.length) % items.length;
+    renderLightbox();
+  }
+  function nextImage() {
+    const { items } = cur();
+    if (!items.length) return;
+    lbItemIdx = (lbItemIdx + 1) % items.length;
+    renderLightbox();
+  }
+  function stepUp() {
+    if (!groupsNewest.length) return;
+    lbGroupIdx = Math.max(0, lbGroupIdx - 1);
+    clampLightbox();
+    renderLightbox();
+  }
+  function stepDown() {
+    if (!groupsNewest.length) return;
+    lbGroupIdx = Math.min(groupsNewest.length - 1, lbGroupIdx + 1);
+    clampLightbox();
+    renderLightbox();
+  }
+
+  $("lbClose").addEventListener("click", closeLightbox);
+  lbBackdrop.addEventListener("click", closeLightbox);
+  $("lbPrev").addEventListener("click", prevImage);
+  $("lbNext").addEventListener("click", nextImage);
+  $("lbStepUp").addEventListener("click", stepUp);
+  $("lbStepDown").addEventListener("click", stepDown);
+
+  // Keyboard
+  window.addEventListener("keydown", (e) => {
+    if (!lb.classList.contains("open")) return;
+    if (e.key === "Escape") closeLightbox();
+    if (e.key === "ArrowLeft") prevImage();
+    if (e.key === "ArrowRight") nextImage();
+    if (e.key === "ArrowUp") stepUp();
+    if (e.key === "ArrowDown") stepDown();
+  });
+
+  // Swipe
+  let sx=null, sy=null;
+  lbMain.addEventListener("touchstart", (e) => {
+    const t = e.touches && e.touches[0];
+    if (!t) return;
+    sx = t.clientX; sy = t.clientY;
+  }, { passive:false });
+
+  lbMain.addEventListener("touchmove", (e) => { e.preventDefault(); }, { passive:false });
+
+  lbMain.addEventListener("touchend", (e) => {
+    const t = e.changedTouches && e.changedTouches[0];
+    if (!t || sx==null || sy==null) return;
+    const dx = t.clientX - sx;
+    const dy = t.clientY - sy;
+    const TH = 35;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      if (Math.abs(dx) > TH) (dx > 0 ? prevImage() : nextImage());
+    } else {
+      if (Math.abs(dy) > TH) (dy > 0 ? stepDown() : stepUp());
+    }
+    sx = sy = null;
+  }, { passive:false });
+
+
+  // ===== Loss Graph =====
+  function uniqAppendLossPoints(newPts){
+    if (!Array.isArray(newPts) || newPts.length === 0) return;
+    // fast path: append, then de-dupe by step (keep last)
+    for (const p of newPts) {
+      const step = toNum(p?.step);
+      const val  = toNum(p?.value);
+      const wt   = toNum(p?.wall_time);
+      if (step == null || val == null) continue;
+      lossPoints.push({ step, value: val, wall_time: wt ?? null });
+    }
+    // de-dupe by step (keep last occurrence)
+    const map = new Map();
+    for (const p of lossPoints) map.set(p.step, p);
+    lossPoints = [...map.values()].sort((a,b)=>a.step-b.step);
+
+    // trim
+    if (lossPoints.length > LOSS_MAX_POINTS) {
+      lossPoints = lossPoints.slice(lossPoints.length - LOSS_MAX_POINTS);
+    }
+  }
+
+  function renderLoss(){
+    const svg = $("lossSvg");
+    const gridG = $("lossGrid");
+    const pathEl = $("lossPath");
+    const dotEl = $("lossLastDot");
+    const minTxt = $("lossMinTxt");
+    const maxTxt = $("lossMaxTxt");
+
+    if (!svg || !gridG || !pathEl) return;
+
+    if (!lossPoints.length) {
+      pathEl.setAttribute("d", "");
+      dotEl.setAttribute("opacity","0");
+      setTxt("lossMeta", activeJob?.id ? "no loss-points…" : "no job");
+      minTxt.textContent = "—";
+      maxTxt.textContent = "—";
+      gridG.innerHTML = "";
+      return;
+    }
+
+    const W = 1000, H = 180;
+    const padL = 10, padR = 10, padT = 10, padB = 18;
+
+    const xs = lossPoints.map(p=>p.step);
+    const ys = lossPoints.map(p=>p.value);
+
+    const xMin = Math.min(...xs), xMax = Math.max(...xs);
+    let yMin = Math.min(...ys), yMax = Math.max(...ys);
+
+    // avoid flat-line division by 0
+    if (yMin === yMax) {
+      const eps = (yMin === 0) ? 1e-6 : Math.abs(yMin) * 0.02;
+      yMin -= eps; yMax += eps;
+    }
+
+    // grid
+    const gridLines = 5;
+    let grid = "";
+    for (let i=0;i<=gridLines;i++){
+      const y = padT + ( (H - padT - padB) * (i/gridLines) );
+      grid += `<line class="lossGridLine" x1="${padL}" y1="${y.toFixed(2)}" x2="${(W-padR)}" y2="${y.toFixed(2)}"></line>`;
+    }
+    gridG.innerHTML = grid;
+
+    const xSpan = Math.max(1, xMax - xMin);
+    const ySpan = (yMax - yMin);
+
+    const mapX = (x)=> padL + ((x - xMin) / xSpan) * (W - padL - padR);
+    const mapY = (y)=> padT + (1 - (y - yMin) / ySpan) * (H - padT - padB);
+
+    // path
+    let d = "";
+    for (let i=0;i<lossPoints.length;i++){
+      const p = lossPoints[i];
+      const x = mapX(p.step);
+      const y = mapY(p.value);
+      d += (i===0 ? "M" : "L") + x.toFixed(2) + " " + y.toFixed(2) + " ";
+    }
+    pathEl.setAttribute("d", d.trim());
+
+    // last dot
+    const last = lossPoints[lossPoints.length-1];
+    const lx = mapX(last.step);
+    const ly = mapY(last.value);
+    dotEl.setAttribute("cx", lx.toFixed(2));
+    dotEl.setAttribute("cy", ly.toFixed(2));
+    dotEl.setAttribute("opacity","1");
+
+    // labels + meta
+    minTxt.textContent = yMin.toFixed(4);
+    maxTxt.textContent = yMax.toFixed(4);
+
+    const latestVal = last.value;
+    const spanTxt = `steps ${xMin}–${xMax} • latest ${latestVal.toFixed(6)} • points ${lossPoints.length}`;
+    setTxt("lossMeta", spanTxt);
+  }
+
+  async function refreshLoss(force=false){
+    if (!activeJob?.id) return;
+
+    // Job changed: reset state
+    if (force || (lossPoints.length && activeJob.id !== (lossJobId || activeJob.id))) {
+      // handled below after we ensure lossJobId exists
+    }
+  }
+
+  let lossJobId = null;
+
+  async function refreshLoss(force=false){
+    if (!activeJob?.id) return;
+
+    if (lossJobId !== activeJob.id) {
+      lossJobId = activeJob.id;
+      lossPoints = [];
+      lossSinceStep = 0;
+    }
+
+    const qs = `?key=${encodeURIComponent(lossKey)}&since_step=${encodeURIComponent(String(force ? 0 : lossSinceStep))}`;
+    const data = await jget(`/jobs/${activeJob.id}/loss${qs}`);
+
+    uniqAppendLossPoints(data?.points || []);
+
+    // next since_step
+    if (lossPoints.length) {
+      lossSinceStep = lossPoints[lossPoints.length-1].step + 1;
+    } else {
+      lossSinceStep = force ? 0 : lossSinceStep;
+    }
+
+    renderLoss();
+  }
+
+
+  // Start
+  (async () => {
+    await tickJobs();
+    await refreshStats();
+    await checkSamplesAndUpdate(true);
+    try { await refreshLoss(true); } catch {}
+
+    setInterval(tickJobs, JOB_POLL_MS);
+    setInterval(refreshStats, STATS_POLL_MS);
+    setInterval(tickSamples, SAMPLE_POLL_MS);
+    setInterval(() => { if (autoOn) refreshLoss(false).catch(()=>{}); }, LOSS_POLL_MS);
+  })();
+</script>
+</body>
+</html>
